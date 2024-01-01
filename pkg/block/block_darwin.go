@@ -286,7 +286,6 @@ func (info *Info) load(ctx context.Context) error {
 		info.Partitions = append(info.Partitions, diskReport.Partitions...)
 	}
 	info.TotalSizeBytes = tsb
-	info.TotalPhysicalBytes = tsb
 
 	return nil
 }

@@ -241,8 +241,6 @@ type Info struct {
 	// TotalSizeBytes contains the total amount of storage, in bytes, on the
 	// host system.
 	TotalSizeBytes uint64 `json:"total_size_bytes"`
-	// DEPRECATED: Please use TotalSizeBytes
-	TotalPhysicalBytes uint64 `json:"-"`
 	// Disks contains an array of pointers to `Disk` structs, one for each disk
 	// drive on the host system.
 	Disks []*Disk `json:"disks"`
@@ -265,8 +263,8 @@ func New(ctx context.Context) (*Info, error) {
 // block storage on the host system.
 func (i *Info) String() string {
 	tpbs := util.UNKNOWN
-	if i.TotalPhysicalBytes > 0 {
-		tpb := i.TotalPhysicalBytes
+	if i.TotalSizeBytes > 0 {
+		tpb := i.TotalSizeBytes
 		unit, unitStr := unit.AmountString(int64(tpb))
 		tpb = uint64(math.Ceil(float64(tpb) / float64(unit)))
 		tpbs = fmt.Sprintf("%d%s", tpb, unitStr)

@@ -29,7 +29,7 @@ func TestBlock(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Expected no error creating block.Info, but got %v", err)
 	}
-	tpb := info.TotalPhysicalBytes
+	tpb := info.TotalSizeBytes
 
 	if tpb < 1 {
 		t.Fatalf("Expected >0 total physical bytes, got %d", tpb)
