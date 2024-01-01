@@ -15,6 +15,7 @@ import (
 	"github.com/go-hardware/ghw/pkg/topology"
 )
 
+// GraphicsCard describes a single graphics card on the host system
 type GraphicsCard struct {
 	// the PCI address where the graphics card can be found
 	Address string `json:"address"`
@@ -30,6 +31,7 @@ type GraphicsCard struct {
 	Node *topology.Node `json:"node,omitempty"`
 }
 
+// String returns a human-readable description of the graphics card
 func (card *GraphicsCard) String() string {
 	deviceStr := card.Address
 	if card.DeviceInfo != nil {
@@ -47,20 +49,15 @@ func (card *GraphicsCard) String() string {
 	)
 }
 
+// Info describes the host system's GPUs/graphics cards
 type Info struct {
+	// GraphicsCards is a slice of pointers to `GraphicsCard` structs, one for
+	// each graphics card on the host system.
 	GraphicsCards []*GraphicsCard `json:"cards"`
 }
 
-// New returns a pointer to an Info struct that contains information about the
-// graphics cards on the host system
-func New(ctx context.Context) (*Info, error) {
-	info := &Info{}
-	if err := info.load(ctx); err != nil {
-		return nil, err
-	}
-	return info, nil
-}
-
+// String returns a human-readable description of the host system's
+// GPUs/graphics cards
 func (i *Info) String() string {
 	numCardsStr := "cards"
 	if len(i.GraphicsCards) == 1 {
@@ -71,6 +68,16 @@ func (i *Info) String() string {
 		len(i.GraphicsCards),
 		numCardsStr,
 	)
+}
+
+// New returns a pointer to an Info struct that contains information about the
+// graphics cards on the host system
+func New(ctx context.Context) (*Info, error) {
+	info := &Info{}
+	if err := info.load(ctx); err != nil {
+		return nil, err
+	}
+	return info, nil
 }
 
 // simple private struct used to encapsulate gpu information in a top-level
