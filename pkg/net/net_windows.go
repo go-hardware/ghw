@@ -45,7 +45,6 @@ func nics(win32NetDescriptions []win32NetworkAdapter) []*NIC {
 	for _, nicDescription := range win32NetDescriptions {
 		nic := &NIC{
 			Name:         netDeviceName(nicDescription),
-			MacAddress:   *nicDescription.MACAddress,
 			MACAddress:   *nicDescription.MACAddress,
 			IsVirtual:    netIsVirtual(nicDescription),
 			Capabilities: []*NICCapability{},

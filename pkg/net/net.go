@@ -33,8 +33,6 @@ type NIC struct {
 	Name string `json:"name"`
 	// MACAddress is the Media Access Control (MAC) address of this NIC.
 	MACAddress string `json:"mac_address"`
-	// DEPRECATED: Please use MACAddress instead.
-	MacAddress string `json:"-"`
 	// IsVirtual is true if the NIC is entirely virtual/emulated, false
 	// otherwise.
 	IsVirtual bool `json:"is_virtual"`
