@@ -8,10 +8,23 @@
 ![ghw mascot](images/ghw-gopher.png)
 
 `ghw` is a Go library providing hardware inspection and discovery for Linux and
-Windows. There exists partial support for MacOSX.
+Windows. There is partial support for MacOSX.
 
 `ghw` gathers information about your hardware's **capacity**, **capabilities**,
 and **resource usage**.
+
+## History
+
+`go-hardware/ghw` began life as [`jaypipes/ghw`][jaypipes-ghw]. All
+functionality from `jaypipes/ghw` was ported over to `go-hardware/ghw` by Jay
+Pipes in an effort to bring `ghw` into a non-personal Github organization and
+increase the number of contributors to `ghw`.
+
+If you're a `jaypipes/ghw` user, read the
+[documentation on changes](#coming-from-githubcomjaypipesghw) between the
+old and new `ghw`.
+
+[jaypipes-ghw]: https://github.com/jaypipes/ghw
 
 ## Design Principles
 
@@ -65,14 +78,38 @@ host hardware:
 * [`ghw.Product()`](#product)
 
 Each top-level function has the same signature. The top-level functions accept
-one parameter of type `context.Context`.
+one parameter of type `context.Context` and return a pointer to a `ghw.XXXInfo`
+struct.
 
-A `ghw.XXXInfo` struct corresponds the name of the module being queried. For
+A `ghw.XXXInfo` struct corresponds to the name of the module being queried. For
 example, the `ghw.CPU` module's `ghw.XXXInfo` struct is `ghw.CPUInfo`.
 
-`ghw.WithOption` structs are returned from
-[`ghw` functions prefix with `With`][#with-functions], for example
-`ghw.WithCollectUsage()` or `ghw.WithChroot()`.
+To control `ghw`'s discovery behaviour, when calling a module function, pass in
+a `context.Context` object returned from `ghw.NewContext()` that has been
+modified with a `ghw` [*With function*](#with-functions).
+
+Here is an example of using a with function to disable any warnings that `ghw`
+might write to `stderr`:
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/go-hardware/ghw"
+)
+
+func main() {
+	ctx := ghw.NewContext(ghw.WithDisableWarnings())
+	cpu, err := ghw.CPU(ctx)
+	if err != nil {
+		fmt.Printf("Error getting CPU info: %v", err)
+	}
+
+	fmt.Printf("%v\n", cpu)
+}
+```
 
 ## CPU
 
@@ -1308,7 +1345,7 @@ cpu, err := ghw.CPU(ctx)
 **NOTE**: This feature works in addition and is composable with the
 `ghw.WithRootMounpoint()` function and `GHW_ROOT_MOUNTPOINT` environs variable.
 
-### Calling external programs
+### Disable calling of external programs
 
 By default `ghw` may call external programs, for example `ethtool`, to learn
 about hardware capabilities.  In some rare circumstances it may be useful to
@@ -1372,6 +1409,86 @@ memory (16GB physical, 16GB usable, 4GB used)
 jaypipes@lappie:~/$ ghw memory -s testdata/snapshots/linux-amd64-intel-xeon-L5640.tar.gz 
 memory (66GB physical, 63GB usable, 2GB used)
 ```
+
+## Coming from github.com/jaypipes/ghw
+
+There are some differences between the original `jaypipes/ghw` codebase and
+`go-hardware/ghw`.
+
+* Module function call signature
+* `ghwc` CLI tool is now called just `ghw`
+* `ghw-snapshot` CLI tool is now `ghw snapshot`
+
+### Module function call signature changes
+
+While `go-hardware/ghw` follows the same naming conventions as `jaypipes/ghw`,
+*the module function signature changed* to use the more Go idiomatic passing of a
+`context.Context` object.
+
+This means that if you are porting your application to use the new
+`go-hardware/ghw` codebase, you will need to make the following changes:
+
+1) Change all your imports from `github.com/jaypipes/ghw` to
+  `github.com/go-hardware/ghw`.
+
+2) Update your module function calls to use the new
+`go-hardware/ghw:NewContext()` and `go-hardware/ghw`
+[With functions](#with-functions)
+
+Previously, your `jaypipes/ghw` code would have looked like this:
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/jaypipes/ghw"
+)
+
+func main() {
+	memory, err := ghw.Memory(ghw.WithDisableWarnings())
+	if err != nil {
+		fmt.Printf("Error getting memory info: %v", err)
+	}
+
+	fmt.Println(memory.String())
+}
+```
+
+you will want to update your code to the following:
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/go-hardware/ghw"
+)
+
+func main() {
+	ctx := ghw.NewContext(ghw.WithDisableWarnings())
+	memory, err := ghw.Memory(ctx)
+	if err != nil {
+		fmt.Printf("Error getting memory info: %v", err)
+	}
+
+	fmt.Println(memory.String())
+}
+```
+
+### `ghwc` is now `ghw`
+
+The old `jaypipes/ghw`'s `ghwc` CLI tool was renamed to just `ghw`. There were
+no changes to existing `ghwc` subcommands like `memory`, `cpu`, etc.
+
+### `ghw-snapshot` is now `ghw snapshot`
+
+The old `jaypipes/ghw`'s `ghw-snapshot` tool was made a subcommand of the main
+`ghw` CLI tool. See the documentation on [creating](#create-a-snapshot) and
+[inspecting](#inspect-a-snapshot) snapshots to learn how to use this
+subcommand.
 
 ## Developers
 
