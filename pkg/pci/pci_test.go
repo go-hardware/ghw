@@ -1,0 +1,61 @@
+//
+// Use and distribution licensed under the Apache license version 2.
+//
+// See the COPYING file in the root project directory for full text.
+//
+
+package pci_test
+
+import (
+	"context"
+	"os"
+	"testing"
+
+	"github.com/go-hardware/ghw/pkg/pci"
+)
+
+func TestPCI(t *testing.T) {
+	if _, ok := os.LookupEnv("GHW_TESTING_SKIP_PCI"); ok {
+		t.Skip("Skipping PCI tests.")
+	}
+
+	info, err := pci.New(context.TODO())
+	if err != nil {
+		t.Fatalf("Expected no error creating PciInfo, but got %v", err)
+	}
+
+	// Since we can't count on a specific device being present on the machine
+	// being tested (and we haven't built in fixtures/mocks for things yet)
+	// about all we can do is verify that the returned list of pointers to
+	// PCIDevice structs is non-empty
+	devs := info.Devices
+	if len(devs) == 0 {
+		t.Fatalf("Expected to find >0 PCI devices in PCIInfo.Devices but got 0.")
+	}
+
+	// Ensure that the data fields are at least populated, even if we don't yet
+	// check for data accuracy
+	for _, dev := range devs {
+		if dev.Class == nil {
+			t.Fatalf("Expected device class for %s to be non-nil", dev.Address)
+		}
+		if dev.Product == nil {
+			t.Fatalf("Expected device product for %s to be non-nil", dev.Address)
+		}
+		if dev.Vendor == nil {
+			t.Fatalf("Expected device vendor for %s to be non-nil", dev.Address)
+		}
+		if dev.Revision == "" {
+			t.Fatalf("Expected device revision for %s to be non-empty", dev.Address)
+		}
+		if dev.Subclass == nil {
+			t.Fatalf("Expected device subclass for %s to be non-nil", dev.Address)
+		}
+		if dev.Subsystem == nil {
+			t.Fatalf("Expected device subsystem for %s to be non-nil", dev.Address)
+		}
+		if dev.ProgrammingInterface == nil {
+			t.Fatalf("Expected device programming interface for %s to be non-nil", dev.Address)
+		}
+	}
+}

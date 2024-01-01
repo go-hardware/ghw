@@ -1,0 +1,108 @@
+// Use and distribution licensed under the Apache license version 2.
+//
+// See the COPYING file in the root project directory for full text.
+//
+
+package topology
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
+
+	ghwcontext "github.com/go-hardware/ghw/pkg/context"
+	"github.com/go-hardware/ghw/pkg/cpu"
+	"github.com/go-hardware/ghw/pkg/memory"
+	ghwpath "github.com/go-hardware/ghw/pkg/path"
+)
+
+func (i *Info) load(ctx context.Context) error {
+	i.Nodes = topologyNodes(ctx)
+	if len(i.Nodes) == 1 {
+		i.Architecture = ArchitectureSMP
+	} else {
+		i.Architecture = ArchitectureNUMA
+	}
+	return nil
+}
+
+func topologyNodes(ctx context.Context) []*Node {
+	paths := ghwpath.New(ctx)
+	nodes := make([]*Node, 0)
+
+	files, err := os.ReadDir(paths.SysDevicesSystemNode)
+	if err != nil {
+		ghwcontext.Warn(ctx, "failed to determine nodes: %s\n", err)
+		return nodes
+	}
+	for _, file := range files {
+		filename := file.Name()
+		if !strings.HasPrefix(filename, "node") {
+			continue
+		}
+		node := &Node{}
+		nodeID, err := strconv.Atoi(filename[4:])
+		if err != nil {
+			ghwcontext.Warn(ctx, "failed to determine node ID: %s\n", err)
+			return nodes
+		}
+		node.ID = nodeID
+		cores, err := cpu.CoresForNode(ctx, nodeID)
+		if err != nil {
+			ghwcontext.Warn(ctx, "failed to determine cores for node: %s\n", err)
+			return nodes
+		}
+		node.Cores = cores
+		caches, err := memory.CachesForNode(ctx, nodeID)
+		if err != nil {
+			ghwcontext.Warn(ctx, "failed to determine caches for node: %s\n", err)
+			return nodes
+		}
+		node.Caches = caches
+
+		distances, err := distancesForNode(ctx, nodeID)
+		if err != nil {
+			ghwcontext.Warn(ctx, "failed to determine node distances for node: %s\n", err)
+			return nodes
+		}
+		node.Distances = distances
+
+		area, err := memory.AreaForNode(ctx, nodeID)
+		if err != nil {
+			ghwcontext.Warn(ctx, "failed to determine memory area for node: %s\n", err)
+			return nodes
+		}
+		node.Memory = area
+
+		nodes = append(nodes, node)
+	}
+	return nodes
+}
+
+func distancesForNode(ctx context.Context, nodeID int) ([]int, error) {
+	paths := ghwpath.New(ctx)
+	path := filepath.Join(
+		paths.SysDevicesSystemNode,
+		fmt.Sprintf("node%d", nodeID),
+		"distance",
+	)
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	items := strings.Fields(strings.TrimSpace(string(data)))
+	dists := make([]int, len(items)) // TODO: can a NUMA cell be offlined?
+	for idx, item := range items {
+		dist, err := strconv.Atoi(item)
+		if err != nil {
+			return dists, err
+		}
+		dists[idx] = dist
+	}
+	return dists, nil
+}
