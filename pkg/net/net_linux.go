@@ -67,7 +67,6 @@ func nics(ctx context.Context) []*NIC {
 		}
 
 		mac := netDeviceMacAddress(paths, filename)
-		nic.MacAddress = mac
 		nic.MACAddress = mac
 		if etAvailable {
 			nic.netDeviceParseEthtool(ctx, filename)
