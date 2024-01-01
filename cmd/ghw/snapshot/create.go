@@ -155,7 +155,7 @@ func (s *snapshotter) createSnapshot() error {
 		}
 
 		switch hdr.Typeflag {
-		case tar.TypeReg, tar.TypeRegA:
+		case tar.TypeReg:
 			f, err := os.Open(path)
 			if err != nil {
 				return err
