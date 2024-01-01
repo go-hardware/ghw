@@ -31,7 +31,6 @@ func (i *Info) load(ctx context.Context) error {
 		tsb += d.SizeBytes
 	}
 	i.TotalSizeBytes = tsb
-	i.TotalPhysicalBytes = tsb
 	return nil
 }
 

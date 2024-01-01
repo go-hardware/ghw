@@ -65,9 +65,9 @@ func TestSystem(t *testing.T) {
 		t.Fatalf("Expected non-nil Block but got nil.")
 	}
 
-	blockTpb := block.TotalPhysicalBytes
-	if blockTpb < 1 {
-		t.Fatalf("Expected >0 total physical block bytes, but got %d", blockTpb)
+	blockTsb := block.TotalSizeBytes
+	if blockTsb < 1 {
+		t.Fatalf("Expected >0 total size bytes, but got %d", blockTsb)
 	}
 
 	topology := system.Topology
