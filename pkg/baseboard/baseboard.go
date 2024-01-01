@@ -15,13 +15,19 @@ import (
 
 // Info defines baseboard release information
 type Info struct {
-	AssetTag     string `json:"asset_tag"`
+	// AssetTag is the asset tag assigned to the baseboard, if any
+	AssetTag string `json:"asset_tag"`
+	// SerialNumber is the serial number assigned to the baseboard, if any
 	SerialNumber string `json:"serial_number"`
-	Vendor       string `json:"vendor"`
-	Version      string `json:"version"`
-	Product      string `json:"product"`
+	// Vendor is the identifier of the baseboard's vendor, if any
+	Vendor string `json:"vendor"`
+	// Version is the vendor-specific version of the baseboard, if any
+	Version string `json:"version"`
+	// Product is the PCI product string for the baseboard, if any
+	Product string `json:"product"`
 }
 
+// String returns a human-readable description of the host's baseboard
 func (i *Info) String() string {
 	vendorStr := ""
 	if i.Vendor != "" {
