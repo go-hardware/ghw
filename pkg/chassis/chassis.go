@@ -56,12 +56,18 @@ var (
 
 // Info defines chassis release information
 type Info struct {
-	AssetTag        string `json:"asset_tag"`
-	SerialNumber    string `json:"serial_number"`
-	Type            string `json:"type"`
+	// AssetTag is the asset tag assigned to the chassis, if any
+	AssetTag string `json:"asset_tag"`
+	// SerialNumber is the serial number assigned to the chassis, if any
+	SerialNumber string `json:"serial_number"`
+	// Type is the type code of the chassis
+	Type string `json:"type"`
+	// TypeDescription is the long-form string of the type code of the chassis
 	TypeDescription string `json:"type_description"`
-	Vendor          string `json:"vendor"`
-	Version         string `json:"version"`
+	// Vendor is the identifier of the chassis's vendor, if any
+	Vendor string `json:"vendor"`
+	// Version is the vendor-specific version of the chassis, if any
+	Version string `json:"version"`
 }
 
 func (i *Info) String() string {
