@@ -16,11 +16,15 @@ import (
 
 // Info defines BIOS release information
 type Info struct {
-	Vendor  string `json:"vendor"`
+	// Vendor is the identifier of the BIOS vendor, if any
+	Vendor string `json:"vendor"`
+	// Version is the vendor-specific version of the BIOS, if any
 	Version string `json:"version"`
-	Date    string `json:"date"`
+	// Date is the date the BIOS was released
+	Date string `json:"date"`
 }
 
+// String returns a human-readable description of the host's BIOS
 func (i *Info) String() string {
 
 	vendorStr := ""
