@@ -21,11 +21,17 @@ import (
 //
 // See https://en.wikipedia.org/wiki/DIMM
 type Module struct {
-	Label        string `json:"label"`
-	Location     string `json:"location"`
+	// Label is the system label, if any, for the memory module
+	Label string `json:"label"`
+	// Location stores the slot and memory channel location for the memory
+	// module
+	Location string `json:"location"`
+	// SerialNumber is any serial number found for the memory module
 	SerialNumber string `json:"serial_number"`
-	SizeBytes    int64  `json:"size_bytes"`
-	Vendor       string `json:"vendor"`
+	// SizeBytes is the amount of physical RAM found in the memory module
+	SizeBytes int64 `json:"size_bytes"`
+	// Vendor contains the vendor, if any, for the memory module
+	Vendor string `json:"vendor"`
 }
 
 // Area describes a set of physical memory on a host system. Non-NUMA systems
@@ -33,12 +39,24 @@ type Module struct {
 // system can use. NUMA systems will have multiple memory areas, one or more
 // for each NUMA node/cell in the system.
 type Area struct {
+	// TotalPhysicalBytes is the total amount of RAM supplied by this memory
+	// area
 	TotalPhysicalBytes int64 `json:"total_physical_bytes"`
-	TotalUsableBytes   int64 `json:"total_usable_bytes"`
-	TotalUsedBytes     int64 `json:"total_used_bytes"`
-	// An array of sizes, in bytes, of memory pages supported in this area
-	SupportedPageSizes []uint64  `json:"supported_page_sizes"`
-	Modules            []*Module `json:"modules"`
+	// TotalUsableBytes is the total amount of RAM available for use by the
+	// system from this memory area. Note that the bootloader can consume some
+	// amount of memory from a memory area. The difference between
+	// TotalPhysicalBytes and TotalUsableBytes is the amount of memory reserved
+	// for the bootloader.
+	TotalUsableBytes int64 `json:"total_usable_bytes"`
+	// TotalUsedBytes is the total amount of memory consumed by the kernel and
+	// all applications running on the system.
+	TotalUsedBytes int64 `json:"total_used_bytes"`
+	// SupportedPageSizes is a slice of sizes, in bytes, of memory pages
+	// supported in this area
+	SupportedPageSizes []uint64 `json:"supported_page_sizes"`
+	// Modules contains a slice of `Module` pointers for any memory module
+	// descriptors found for this memory area
+	Modules []*Module `json:"modules"`
 }
 
 // String returns a short string with a summary of information for this memory
