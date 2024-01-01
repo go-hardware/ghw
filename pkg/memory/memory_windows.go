@@ -11,7 +11,7 @@ import (
 
 	"github.com/StackExchange/wmi"
 
-	"github.com/go-hardware/ghw/pkg/unitutil"
+	"github.com/go-hardware/ghw/pkg/unit"
 )
 
 const wqlOperatingSystem = "SELECT TotalVisibleMemorySize FROM Win32_OperatingSystem"
@@ -66,7 +66,7 @@ func (i *Info) load(_ context.Context) error {
 	for _, description := range win32OSDescriptions {
 		// TotalVisibleMemorySize is the amount of memory available for us by
 		// the operating system **in Kilobytes**
-		totalUsableBytes += *description.TotalVisibleMemorySize * uint64(unitutil.KB)
+		totalUsableBytes += *description.TotalVisibleMemorySize * uint64(unit.KB)
 	}
 	i.TotalUsableBytes = int64(totalUsableBytes)
 	i.TotalPhysicalBytes = int64(totalPhysicalBytes)
