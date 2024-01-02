@@ -8,7 +8,7 @@ package chassis
 import (
 	"context"
 
-	"github.com/StackExchange/wmi"
+	"github.com/yusufpapurcu/wmi"
 
 	"github.com/go-hardware/ghw/pkg/util"
 )
