@@ -80,13 +80,26 @@ func (a *Architecture) UnmarshalJSON(b []byte) error {
 // memory caching available to the single physical processor package's physical
 // processor cores
 type Node struct {
-	ID        int                  `json:"id"`
-	Cores     []*cpu.ProcessorCore `json:"cores"`
-	Caches    []*memory.Cache      `json:"caches"`
-	Distances []int                `json:"distances"`
-	Memory    *memory.Area         `json:"memory"`
+	// ID is the zero-based index/identifier of the Node
+	ID int `json:"id"`
+	// Cores is a slice of pointers to `pkg/cpu.ProcessorCore` structs for
+	// processor cores in this Node
+	Cores []*cpu.ProcessorCore `json:"cores"`
+	// Caches is a slice of pointers to `pkg/memory.Cache` structs for memory
+	// caches on this Node
+	Caches []*memory.Cache `json:"caches"`
+	// Distances is a slice of integer values indicating the relative distance
+	// of logical processors on the host system from this Node. The zero-based
+	// index of the slice is the logical processor ID. The value of the slice
+	// at that index is the relative distance of that logical processor from
+	// this Node.
+	Distances []int `json:"distances"`
+	// Memory is a pointer to the `pkg/memory.Area` struct representing
+	// physical memory affined to this Node
+	Memory *memory.Area `json:"memory"`
 }
 
+// String is a short human-readable description of the Node
 func (n *Node) String() string {
 	return fmt.Sprintf(
 		"node #%d (%d cores)",
@@ -97,8 +110,11 @@ func (n *Node) String() string {
 
 // Info describes the system topology for the host hardware
 type Info struct {
+	// Architecture is the host system architecture
 	Architecture Architecture `json:"architecture"`
-	Nodes        []*Node      `json:"nodes"`
+	// Nodes is a slice of pointers to `Node` structs describing the
+	// topological units of the host system
+	Nodes []*Node `json:"nodes"`
 }
 
 // New returns a pointer to an Info struct that contains information about the
@@ -114,6 +130,8 @@ func New(ctx context.Context) (*Info, error) {
 	return info, nil
 }
 
+// String returns a short, human-readable description of the host system
+// topology
 func (i *Info) String() string {
 	archStr := "SMP"
 	if i.Architecture == ArchitectureNUMA {
