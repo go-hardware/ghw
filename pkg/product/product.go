@@ -15,15 +15,23 @@ import (
 
 // Info defines product information
 type Info struct {
-	Family       string `json:"family"`
-	Name         string `json:"name"`
-	Vendor       string `json:"vendor"`
+	// Family is a PCI product family code, if any
+	Family string `json:"family"`
+	// Name is the name of the product, if any
+	Name string `json:"name"`
+	// Vendor is the identifier of the product's vendor, if any
+	Vendor string `json:"vendor"`
+	// SerialNumber is the serial number assigned to the product, if any
 	SerialNumber string `json:"serial_number"`
-	UUID         string `json:"uuid"`
-	SKU          string `json:"sku"`
-	Version      string `json:"version"`
+	// UUID is the UUID of the product, if any
+	UUID string `json:"uuid"`
+	// SKU is the stock unit identifier (SKU) of the product, if any
+	SKU string `json:"sku"`
+	// Version is the vendor-specific version of the product, if any
+	Version string `json:"version"`
 }
 
+// String is a human-readable description of the PCI product
 func (i *Info) String() string {
 	familyStr := ""
 	if i.Family != "" {
