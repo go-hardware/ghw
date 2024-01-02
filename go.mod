@@ -3,11 +3,11 @@ module github.com/go-hardware/ghw
 go 1.21
 
 require (
-	github.com/StackExchange/wmi v1.2.1
 	github.com/jaypipes/envutil v1.0.0
 	github.com/jaypipes/pcidb v1.0.0
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v0.0.3
+	github.com/yusufpapurcu/wmi v1.2.3
 	gopkg.in/yaml.v3 v3.0.1
 	howett.net/plist v1.0.0
 )

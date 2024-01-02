@@ -9,8 +9,8 @@ import (
 	"context"
 	"strings"
 
-	"github.com/StackExchange/wmi"
 	"github.com/jaypipes/pcidb"
+	"github.com/yusufpapurcu/wmi"
 
 	"github.com/go-hardware/ghw/pkg/pci"
 	"github.com/go-hardware/ghw/pkg/util"
