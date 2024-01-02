@@ -20,22 +20,27 @@ import (
 )
 
 type Device struct {
-	// The PCI address of the device
-	Address   string         `json:"address"`
-	Vendor    *pcidb.Vendor  `json:"vendor"`
-	Product   *pcidb.Product `json:"product"`
-	Revision  string         `json:"revision"`
+	// Address is a string with the PCI address of the device
+	Address string `json:"address"`
+	// Vendor is the PCI Vendor code of the device
+	Vendor *pcidb.Vendor `json:"vendor"`
+	// Product is the PCI Product code of the device
+	Product *pcidb.Product `json:"product"`
+	// Revision is any revision identifier (vendor-specific) for the device
+	Revision string `json:"revision"`
+	// Subsystem is the PCI subsystem code of the device
 	Subsystem *pcidb.Product `json:"subsystem"`
-	// optional subvendor/sub-device information
+	// Class is the PCI class of the device
 	Class *pcidb.Class `json:"class"`
-	// optional sub-class for the device
+	// Subclass is the PCI subclass of the device
 	Subclass *pcidb.Subclass `json:"subclass"`
-	// optional programming interface
+	// ProgrammingInterface is the PCI programming interface of the device
 	ProgrammingInterface *pcidb.ProgrammingInterface `json:"programming_interface"`
-	// Topology node that the PCI device is affined to. Will be nil if the
-	// architecture is not NUMA.
-	Node   *topology.Node `json:"node,omitempty"`
-	Driver string         `json:"driver"`
+	// Node is a pointer to a `pkg/topology.Node` struct that the PCI device is
+	// affined to. Will be nil if the architecture is not NUMA.
+	Node *topology.Node `json:"node,omitempty"`
+	// Driver is a string containing driver information, if any, for the device
+	Driver string `json:"driver"`
 }
 
 type devIdent struct {
@@ -55,9 +60,9 @@ type devMarshallable struct {
 	Interface devIdent `json:"programming_interface"`
 }
 
-// NOTE(go-hardware) Device has a custom JSON marshaller because we don't want
-// to serialize the entire PCIDB information for the Vendor (which includes all
-// of the vendor's products, etc). Instead, we simply serialize the ID and
+// NOTE(jaypipes) Device has a custom JSON marshaller because we don't want to
+// serialize the entire PCIDB information for the Vendor (which includes all of
+// the vendor's products, etc). Instead, we simply serialize the ID and
 // human-readable name of the vendor, product, class, etc.
 func (d *Device) MarshalJSON() ([]byte, error) {
 	dm := devMarshallable{
@@ -92,6 +97,7 @@ func (d *Device) MarshalJSON() ([]byte, error) {
 	return json.Marshal(dm)
 }
 
+// String contains a human-readable description of the PCI device
 func (d *Device) String() string {
 	vendorName := util.UNKNOWN
 	if d.Vendor != nil {
@@ -115,13 +121,17 @@ func (d *Device) String() string {
 	)
 }
 
+// Info contains information about PCI devices on the host system
 type Info struct {
 	db   *pcidb.PCIDB
 	arch topology.Architecture
-	// All PCI devices on the host system
+	// Devices is a slice of `Device` structs containing information on all PCI
+	// devices on the host system
 	Devices []*Device
 }
 
+// String contains a human-readable description of PCI information on the host
+// system.
 func (i *Info) String() string {
 	return fmt.Sprintf("PCI (%d devices)", len(i.Devices))
 }
